@@ -1,0 +1,26 @@
+{
+  "name": "expressjs-webserver",
+  "version": "1.0.0",
+  "description": "Expressjs Application 1. At command prompt, create a folder expressjs-webserver <br> \t$ mkdir expressjs-webserver 2. Change folder to the newly created folder <br>         $ cd expressjs-webserver 3. Initialize nodejs (this command will create package.json) <br>         $ npm init -y 4. Open folder using vscode <br>         $ code . 5. create index.js 5. open package.json to explore dependencies (libraries), then install them <br>         $ npm install 6. copy content from index.js on github to your index.js 7. Run nodejs application from the command prompt <br>         $ node index.js 8. Open browser http://localhost:3000 and http://localhost:3000/admin 9. Try http://localhost:3000/account  (you should see 404 error in chrome dev tool) 10. Use ctrl+c to stop node application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start" : "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/werayuthgswu/expressjs-webserver.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/werayuthgswu/expressjs-webserver/issues"
+  },
+  "homepage": "https://github.com/werayuthgswu/expressjs-webserver#readme",
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "ejs": "^3.1.9",
+    "express": "^4.18.2"
+  }
+}
