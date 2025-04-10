@@ -4,28 +4,47 @@
   <meta charset="UTF-8">
   <title>View Notes</title>
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    /* Gradient background */
+    body {
+      background: linear-gradient(to left, #4E1F00, #74512D, #FEBA17 , #F8F4E1);
+    }
+  </style>
 </head>
 <body class="bg-gray-100">
 
   <%- include('navbar') %> <!-- Include navbar from home page -->
 
-<div class="max-w-4xl mx-auto p-4 mt-10 bg-white rounded-lg shadow-md">
-  <h1 class="text-2xl font-bold mb-4">Your Notes</h1>
+  <div class="max-w-4xl mx-auto p-4 mt-10 bg-white rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold mb-4">Your Notes</h1>
 
-  <% if (notes && notes.length > 0) { %>
-    <ul>
-      <% notes.forEach(note => { %>
-        <li class="border-b border-gray-200 py-4">
-          <h2 class="text-xl font-semibold text-gray-800"><%= note.title %></h2>
-          <p class="text-gray-600 mt-2"><%= note.content %></p>
-          <span class="text-sm text-gray-500">Created at: <%= note.createdAt.toLocaleDateString() %></span>
-        </li>
-      <% }) %>
-    </ul>
-  <% } else { %>
-    <p class="text-gray-500">You don't have any notes yet.</p>
-  <% } %>
-</div>
+    <!-- Show logged in user's name -->
+    <p class="text-lg text-gray-700">Welcome, <%= loggedInUser.username %>!</p>
+
+    <% if (notes && notes.length > 0) { %>
+      <ul>
+        <% notes.forEach(note => { %>
+          <li class="border-b border-gray-200 py-4">
+            <h2 class="text-xl font-semibold text-gray-800"><%= note.title %></h2>
+            <p class="text-gray-600 mt-2"><%= note.content %></p>
+            <% if (note.createdAt) { %>
+              <span class="text-sm text-gray-500">Created at: <%= new Date(note.createdAt).toLocaleDateString() %></span>
+            <% } %>
+
+            <!-- Edit Button (links to edit page) -->
+            <a href="/notes/edit/<%= note._id %>" class="text-blue-500 hover:text-blue-700 mt-2 inline-block">Edit</a>
+
+            <!-- Delete Button (calls delete route) -->
+            <form action="/notes/delete/<%= note._id %>" method="POST" style="display:inline;">
+              <button type="submit" class="text-red-500 hover:text-red-700 mt-2">Delete</button>
+            </form>
+          </li>
+        <% }) %>
+      </ul>
+    <% } else { %>
+      <p class="text-gray-500">You don't have any notes yet.</p>
+    <% } %>
+  </div>
 
 </body>
 </html>

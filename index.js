@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const path = require('path');
 const session = require('express-session');
+const User = require('./models/User');  // Import the User model
+const Note = require('./models/NoteM');  // Import the Note model
 
 
 const taskController = require('./controllers/taskController');
@@ -45,38 +47,49 @@ app.get('/note', (req, res) => {
 });
 
 // In your route handler for rendering 'note.ejs'
+app.get('/edit', (req, res) => {
+  const loggedInUser = req.session.user;  // Retrieve the full user object from the session
+  res.render('edit', { loggedInUser });   // Pass it to the view
+});
+
+// In your route handler for rendering 'note.ejs'
 app.get('/create', (req, res) => {
   const loggedInUser = req.session.user;  // Retrieve the full user object from the session
   res.render('create', { loggedInUser });   // Pass it to the view
 });
 
-app.get('/view', (req, res) => {
-  const loggedInUser = req.session.user;  // Retrieve the full user object from the session
-  res.render('view', { loggedInUser });   // Pass it to the view
+app.get('/view', async (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
+  try {
+    console.log('User in session:', req.session.user);
+
+    // Fetch the logged-in user from the database
+    const loggedInUser = await User.findById(req.session.user.id);
+    if (!loggedInUser) {
+      return res.status(404).send('User not found');
+    }
+
+    // Fetch the user's notes
+    const notes = await Note.find({ user: req.session.user.id });
+
+    console.log('Fetched notes:', notes);
+
+    // Render the view with notes and loggedInUser
+    res.render('view', { notes, loggedInUser });
+  } catch (err) {
+    console.error('Error fetching notes:', err);
+    res.status(500).send('Server error');
+  }
 });
 
 // Import routes
 const noteRoutes = require('./routes/noteRoutes');
 app.use(noteRoutes);  // Use the note routes
 
-const Note = require('./models/NoteM');  // Assuming you have a Note model
-
-// In your /view route handler, fetch notes from MongoDB or another data source
-app.get('/view', (req, res) => {
-  const loggedInUser = req.session.user;  // Retrieve the full user object from the session
-
-  // Fetch notes from the database (for example, notes belonging to the logged-in user)
-  Note.find({ userId: loggedInUser._id })
-    .then(notes => {
-      res.render('view', { loggedInUser, notes });  // Pass notes along with loggedInUser to the view
-    })
-    .catch(err => {
-      console.error('Error fetching notes:', err);
-      res.render('view', { loggedInUser, notes: [] });  // If error, pass empty array
-    });
-});
-
-
+app.use('/notes', noteRoutes);  // Linking the routes defined in noteroutes.js to /notes
 app.get('/view/:name', taskController.viewTask);
 app.get('/logout', authController.logout);
 app.get('/sort', authController.authenticate, taskController.sortTasksByPriority);
