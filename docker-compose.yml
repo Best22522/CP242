@@ -1,0 +1,22 @@
+version: '3'
+services:
+  mongodb:
+    image: mongo  # This uses the official MongoDB Docker image
+    container_name: mongodb
+    ports:
+      - "27017:27017"  # Exposes port 27017 (default MongoDB port) to your local machine
+    volumes:
+      - mongodb_data:/data/db  # Stores MongoDB data persistently
+
+  app:
+    build: .  # This tells Docker to build an image for your app using the Dockerfile in the current directory
+    container_name: note-app
+    environment:
+      - MONGO_URI=mongodb://mongodb:27017/mydatabase  # Connects the app to the MongoDB container
+    depends_on:
+      - mongodb  # Ensures MongoDB starts before the app
+    ports:
+      - "3000:3000"  # Maps your app's port to your local machine (if it's running on port 3000)
+
+volumes:
+  mongodb_data:

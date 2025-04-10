@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Home</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    /* styles.css */
+.navbar {
+    background-color: white;
+    padding: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+  }
+  
+  .navbar .logo {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #3b82f6; /* Blue color */
+    margin-left: 100px;
+  }
+  
+  .navbar .auth-links {
+    display: flex;
+    align-items: center;
+    margin-right: 100px;
+  }
+  
+  .navbar .auth-links a {
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    border-radius: 0.375rem; /* Rounded */
+    transition: all 0.3s ease;
+  }
+  
+  .navbar .auth-links a.login {
+    border: 2px solid #3b82f6; /* Blue border */
+    color: #3b82f6; /* Blue text */
+  }
+  
+  .navbar .auth-links a.login:hover {
+    background-color: #3b82f6;
+    color: white;
+  }
+  
+  .navbar .auth-links a.logout {
+    border: 2px solid #ef4444; /* Red border */
+    color: #ef4444; /* Red text */
+  }
+  
+  .navbar .auth-links a.logout:hover {
+    background-color: #ef4444;
+    color: white;
+  }
+  
+  </style>
+</head>
+<body class="bg-gray-100">
+
+  <nav class="navbar">
+    <div class="logo">Mongo Note</div>
+    
+    <% if (loggedInUser) { %>
+      <a href="create" class="note">Create</a>
+      <a href="view" class="note">View</a>
+    <% } %>
+    
+    <div class="auth-links">
+      <% if (loggedInUser) { %>
+        <span class="mr-4 text-gray-700">Hello, <%= loggedInUser.username %> </span>
+        <a href="/logout" class="logout">Logout</a>
+      <% } else { %>
+        <a href="/login" class="login">Login</a>
+      <% } %>
+    </div>
+  </nav>
+  
+
+</body>
+</html>

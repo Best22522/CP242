@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Notes</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    /* Add custom CSS for the hover animation */
+    .btn-hover:hover {
+      transform: translateY(-4px);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Gradient background */
+    body {
+      background: linear-gradient(to left, #4E1F00, #74512D, #FEBA17 , #F8F4E1);
+    }
+
+    .text-center {
+      margin-top: 100px; /* Adjust this value to center vertically */
+    }
+
+  </style>
+</head>
+<body>
+
+  <%- include('navbar') %>  <!-- Include your navbar from the home page -->
+
+  <div class="text-center">
+    <h1 class="text-3xl font-bold text-white">Your Notes</h1>
+    <p class="mt-4 text-lg text-white">Here you can add and view your personal notes</p>
+    </div>
+  </div>
+
+</body>
+</html>
