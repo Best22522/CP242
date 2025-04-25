@@ -85,6 +85,133 @@ app.get('/view', async (req, res) => {
   }
 });
 
+// Route สำหรับการสร้างโน้ตใหม่
+app.post('/create', async (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
+  try {
+    const { title, content } = req.body;
+
+    // สร้างโน้ตใหม่
+    const newNote = new Note({
+      title,
+      content,
+      user: req.session.user.id  // เพิ่ม user ID เพื่อเก็บว่าโน้ตนี้ของใคร
+    });
+
+    await newNote.save();  // บันทึกลง MongoDB
+
+    res.redirect('/view');  // ไปที่หน้า view ที่จะแสดงโน้ตทั้งหมด
+  } catch (err) {
+    console.error('Error creating note:', err);
+    res.status(500).send('Server error');
+  }
+});
+
+// Route สำหรับการดูโน้ตทั้งหมดของผู้ใช้
+app.get('/view', async (req, res) => {
+  if (!req.session.user) {
+    return res.redirect('/login');
+  }
+
+  try {
+    console.log('User in session:', req.session.user);
+
+    // Fetch the logged-in user from the database
+    const loggedInUser = await User.findById(req.session.user.id);
+    if (!loggedInUser) {
+      return res.status(404).send('User not found');
+    }
+
+    // Fetch the user's notes
+    const notes = await Note.find({ user: req.session.user.id });
+
+    console.log('Fetched notes:', notes);
+
+    // Render the view with notes and loggedInUser
+    res.render('view', { notes, loggedInUser });
+  } catch (err) {
+    console.error('Error fetching notes:', err);
+    res.status(500).send('Server error');
+  }
+});
+
+// Route สำหรับการแสดงฟอร์มแก้ไขโน้ต
+app.get('/edit/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const note = await Note.findById(id);
+    if (!note) {
+      return res.status(404).send('Note not found');
+    }
+
+    // ตรวจสอบว่าโน้ตนี้เป็นของผู้ใช้ที่ล็อกอินอยู่
+    if (note.user.toString() !== req.session.user.id) {
+      return res.status(403).send('Not authorized');
+    }
+
+    res.render('edit', { note });
+  } catch (err) {
+    console.error('Error fetching note:', err);
+    res.status(500).send('Server error');
+  }
+});
+
+// Route สำหรับบันทึกการอัปเดตโน้ต
+app.post('/edit/:id', async (req, res) => {
+  const { id } = req.params;
+  const { title, content } = req.body;
+
+  try {
+    const note = await Note.findById(id);
+    if (!note) {
+      return res.status(404).send('Note not found');
+    }
+
+    // ตรวจสอบว่าโน้ตนี้เป็นของผู้ใช้ที่ล็อกอินอยู่
+    if (note.user.toString() !== req.session.user.id) {
+      return res.status(403).send('Not authorized');
+    }
+
+    // อัปเดตโน้ต
+    note.title = title;
+    note.content = content;
+    await note.save();
+
+    res.redirect('/view');  // ไปที่หน้า view เพื่อดูโน้ตที่อัปเดต
+  } catch (err) {
+    console.error('Error updating note:', err);
+    res.status(500).send('Server error');
+  }
+});
+
+// Route สำหรับการลบโน้ต
+app.post('/delete/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const note = await Note.findById(id);
+    if (!note) {
+      return res.status(404).send('Note not found');
+    }
+
+    // ตรวจสอบว่าโน้ตนี้เป็นของผู้ใช้ที่ล็อกอินอยู่
+    if (note.user.toString() !== req.session.user.id) {
+      return res.status(403).send('Not authorized');
+    }
+
+    // ลบโน้ต
+    await note.remove();
+    res.redirect('/view');  // ไปที่หน้า view
+  } catch (err) {
+    console.error('Error deleting note:', err);
+    res.status(500).send('Server error');
+  }
+});
+
 // Import routes
 const noteRoutes = require('./routes/noteRoutes');
 app.use(noteRoutes);  // Use the note routes
