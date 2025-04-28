@@ -19,7 +19,7 @@ exports.login = async (req, res) => {
     if (user && user.password === password) {
       req.session.user = { id: user._id, username: user.username };  // Store user info in session
       console.log(`${username} has logged in`);
-      res.redirect('/note');  // Redirect to note.ejs after successful login
+      res.redirect('/notes');  // Redirect to note.ejs after successful login
     } else {
       res.render('login', { error: 'Invalid credentials' });
     }
@@ -46,7 +46,7 @@ exports.register = async (req, res) => {
     const newUser = new User({ username, password });  // Store password directly
     await newUser.save();
     req.session.user = { id: user._id, username: user.username };  // Store user info in session
-    res.redirect('/note');  // Redirect to note.ejs after successful registration
+    res.redirect('/notes');  // Redirect to note.ejs after successful registration
   } catch (err) {
     res.render('register', { error: 'Registration failed. Try again.' });
   }

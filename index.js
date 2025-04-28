@@ -5,8 +5,6 @@ const session = require('express-session');
 const User = require('./models/User');  // Import the User model
 const Note = require('./models/NoteM');  // Import the Note model
 
-
-const taskController = require('./controllers/taskController');
 const authController = require('./controllers/authController');
 
 const app = express();
@@ -40,10 +38,24 @@ app.get('/', (req, res) => {
   res.render('home', { loggedInUser });
 });
 
-// In your route handler for rendering 'note.ejs'
+app.get('/notes', async (req, res) => {
+  if (!req.session.user) {
+      return res.redirect('/login');
+  }
+
+  try {
+      const notes = await Note.find({ user: req.session.user.id });
+      const loggedInUser = req.session.user;  // <-- get user from session
+      res.render('note', { notes, loggedInUser });  // <-- pass both
+  } catch (err) {
+      console.error('Error fetching notes:', err);
+      res.status(500).send('Server error');
+  }
+});
+
 app.get('/note', (req, res) => {
-  const loggedInUser = req.session.user;  // Retrieve the full user object from the session
-  res.render('note', { loggedInUser });   // Pass it to the view
+  const loggedInUser = req.session.user;  // get the user from session
+  res.render('note', { loggedInUser });
 });
 
 // In your route handler for rendering 'note.ejs'
@@ -217,16 +229,15 @@ const noteRoutes = require('./routes/noteRoutes');
 app.use(noteRoutes);  // Use the note routes
 
 app.use('/notes', noteRoutes);  // Linking the routes defined in noteroutes.js to /notes
-app.get('/view/:name', taskController.viewTask);
 app.get('/logout', authController.logout);
-app.get('/sort', authController.authenticate, taskController.sortTasksByPriority);
+app.get('/sort', authController.authenticate);
 app.get('/login', authController.showLoginPage);
 app.post('/login', authController.login);
 app.get('/register', authController.showRegisterPage);
 app.post('/register', authController.register);
-app.post('/add', authController.authenticate, taskController.addTask);
-app.post('/delete', authController.authenticate, taskController.deleteMultipleTasks);
-app.post('/search', authController.authenticate, taskController.searchTasksByName);
+app.post('/add', authController.authenticate);
+app.post('/delete', authController.authenticate);
+app.post('/search', authController.authenticate);
 
 // --- Start server ---
 const PORT = process.env.PORT || 3000;
